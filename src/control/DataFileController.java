@@ -44,7 +44,7 @@ public class DataFileController {
 	 * @throws NoSuchPaddingException	パディング方式が使用できない場合
 	 * @throws InvalidKeyException		復号化キーが使用できない場合
 	 */
-	@SuppressWarnings("unchecked")
+
 	DefaultListModel<PersonalData> dataFileRead() throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException{
 		// ファイルの中身が空か判定
 		boolean emptyFileCheck = file.length() == 0;

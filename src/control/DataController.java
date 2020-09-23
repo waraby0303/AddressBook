@@ -50,17 +50,17 @@ public class DataController {
 	 * @return 同一内容のデータが存在する場合はfalse,存在しない場合は登録、保存後にtrueを返す。
 	 */
 	public boolean dataRegister(PersonalData data) {
-		
+
 		// データが既に存在するか確認
 		boolean dataExist = listModel.isDataExistsChecked(data);
-		
+
 		if(dataExist == true) {
-			
+
 			// 存在する場合はfalseを返す
 			return false;
-		
+
 		}else {
-			
+
 			// 存在しない場合はデータを登録する
 			listModel.dataAdd(data);
 
@@ -84,14 +84,14 @@ public class DataController {
 	 * @return 同一内容のデータが存在する場合はfalse,存在しない場合は登録、保存後にtrueを返す。
 	 */
 	public boolean dataRevise(PersonalData data,int index) {
-		
+
 		// データが既に存在するか確認
 		boolean dataExists = listModel.isDataExistsChecked(data);
-		
+
 		if(dataExists==true) {
 			return false;
 		}else {
-		
+
 			// データ変更メソッドの呼び出し
 			listModel.dataSet(data,index);
 
@@ -219,6 +219,8 @@ public class DataController {
 		}
 	}
 
+
+
 	/**
 	 * データ保存用ファイルを読み込む
 	 * */
@@ -243,17 +245,22 @@ public class DataController {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, "エラーが発生しました。処理を終了します。");
 		}
-		//JListにDefaultListModelを追加
-		mainFrame.getListPanel().setModel(listModel.getListModel());
-
 	}
 
+	/**
+	 * データファイルを新規作成する
+	 */
 	public void fileCreate() {
+
+		// データ作成メソッドの呼び出し
 		dataFileController.dataFileCreate();
+
+		// JListにDefaultListModelを追加
+		mainFrame.getListPanel().setModel(listModel.getListModel());
 	}
 
 	public String dataDisplay(PersonalData data) {
-		return "名前：" + data.getName() + "\nふりがな：" + data.getNameKana() + 
+		return "名前：" + data.getName() + "\nふりがな：" + data.getNameKana() +
 				"\n住所：" + data.getAddress() + "\n電話番号：" + data.getTel() + "\nメールアドレス：" + data.getMail();
 	}
 
