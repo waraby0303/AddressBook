@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.crypto.NoSuchPaddingException;
+import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 
 import gui.MainFrame;
@@ -24,7 +25,7 @@ public class DataController {
 	private MainFrame mainFrame;
 	private ListModel listModel = new ListModel();
 	private DataFileController dataFileController = new DataFileController();
-	
+
 	public DataController(MainFrame m){
 		mainFrame = m;
 	}
@@ -44,22 +45,34 @@ public class DataController {
 	}
 
 	/**
-	 * 住所録にデータを保存する
-	 * @param data 個人情報
+	 * 住所録にデータを登録し、ファイルに保存する
+	 * @param data 登録するデータ
+	 * @return 同一内容のデータが存在する場合はfalse,存在しない場合は登録、保存後にtrueを返す。
 	 */
-	public void dataRegister(PersonalData data) {
+	public boolean dataRegister(PersonalData data) {
+		
+		// データが既に存在するか確認
+		boolean dataExist = listModel.isDataExistsChecked(data);
+		
+		if(dataExist == true) {
+			
+			// 存在する場合はfalseを返す
+			return false;
+		
+		}else {
+			
+			// 存在しない場合はデータを登録する
+			listModel.dataAdd(data);
 
-		// データ登録メソッドの呼び出し
-		listModel.dataAdd(data);
-
-		// 追加後のデータをファイルに上書きする
-		try {
-			dataFileController.dataFileWrite(listModel.getListModel());
-		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException e) {
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(null, "エラーが発生しました。処理を終了します。");
+			// 追加後のデータをファイルに上書きする
+			try {
+				dataFileController.dataFileWrite(listModel.getListModel());
+			} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException e) {
+				e.printStackTrace();
+				JOptionPane.showMessageDialog(null, "エラーが発生しました。処理を終了します。");
+			}
+			return true;
 		}
-		System.out.println("dataRegisterメソッドの実行");
 	}
 
 
@@ -68,19 +81,29 @@ public class DataController {
 	 * 住所録の登録済みデータを変更する
 	 * @param data 個人情報
 	 * @param index インデックス番号
+	 * @return 同一内容のデータが存在する場合はfalse,存在しない場合は登録、保存後にtrueを返す。
 	 */
-	public void dataRevise(PersonalData data,int index) {
-		// データ変更メソッドの呼び出し
-		listModel.dataSet(data,index);
+	public boolean dataRevise(PersonalData data,int index) {
+		
+		// データが既に存在するか確認
+		boolean dataExists = listModel.isDataExistsChecked(data);
+		
+		if(dataExists==true) {
+			return false;
+		}else {
+		
+			// データ変更メソッドの呼び出し
+			listModel.dataSet(data,index);
 
-		// 変更後のデータをファイルに上書きする
-		try {
-			dataFileController.dataFileWrite(listModel.getListModel());
-		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException e) {
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(null, "エラーが発生しました。処理を終了します。");
+			// 変更後のデータをファイルに上書きする
+			try {
+				dataFileController.dataFileWrite(listModel.getListModel());
+			} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException e) {
+				e.printStackTrace();
+				JOptionPane.showMessageDialog(null, "エラーが発生しました。処理を終了します。");
+			}
+			return true;
 		}
-		System.out.println("dataReviseメソッドの実行");
 	}
 
 
@@ -135,7 +158,6 @@ public class DataController {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, "エラーが発生しました。処理を終了します。");
 		}
-		System.out.println("dataRemoveメソッドの実行");
 	}
 
 	/**
@@ -202,9 +224,21 @@ public class DataController {
 	 * */
 	public void fileRead() {
 
-		// ファイル読み込みメソッドの呼び出し
+
 		try {
-			listModel.setListModel(dataFileController.dataFileRead());
+			// ファイルの読み込みメソッドを呼び出す
+			DefaultListModel<PersonalData> list = dataFileController.dataFileRead();
+
+			if(list == null) {
+
+				// ファイルが空の場合
+				mainFrame.getListPanel().setModel(listModel.getListModel());
+
+			}else {
+
+				// ファイルが空でない場合
+				listModel.setListModel(list);
+			}
 		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, "エラーが発生しました。処理を終了します。");
@@ -219,7 +253,8 @@ public class DataController {
 	}
 
 	public String dataDisplay(PersonalData data) {
-		return "名前：" + data.getName() + "\nふりがな：" + data.getNameKana() + "\n住所：" + data.getAddress() + "\n電話番号：" + data.getTel() + "\nメールアドレス：" + data.getMail();
+		return "名前：" + data.getName() + "\nふりがな：" + data.getNameKana() + 
+				"\n住所：" + data.getAddress() + "\n電話番号：" + data.getTel() + "\nメールアドレス：" + data.getMail();
 	}
 
 	public void csvOutput(File f) {

@@ -75,22 +75,35 @@ public class RegisterPanel extends BasePanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				PersonalData data = mainFrame.getDataController().dataCreate(nameTxt.getText(), nameKanaTxt.getText(), addressTxt.getText(), telTxt.getText(), mailTxt.getText());
-				//新規登録画面
+				//　新規登録画面
 				if(mainFrame.getTitle().equals("新規登録")) {
 					int yesOpt = JOptionPane.showConfirmDialog(registerBtn, "以下の内容で登録します。よろしいですか？\n" + mainFrame.getDataController().dataDisplay(data), null, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 					if( yesOpt == JOptionPane.OK_OPTION) {
-						mainFrame.getDataController().dataRegister(data);
-						JOptionPane.showInternalMessageDialog(null, "登録が完了しました。");
-						textClear();
+						
+						// データ登録メソッドの呼び出し
+						boolean dataRegister = mainFrame.getDataController().dataRegister(data);
+						if(dataRegister == false) {
+							JOptionPane.showInternalMessageDialog(null, "同じデータが既に存在します");
+						}else {
+							JOptionPane.showInternalMessageDialog(null, "登録が完了しました。");
+							textClear();
+						}
 					}
-				//編集画面
+						
+				//　編集画面
 				}else if(mainFrame.getTitle().equals("編集")) {
 					int yesOpt = JOptionPane.showConfirmDialog(registerBtn, "以下の内容で登録します。よろしいですか？\n" + mainFrame.getDataController().dataDisplay(data), null, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 					if( yesOpt == JOptionPane.OK_OPTION) {
-						mainFrame.getDataController().dataRevise(data, index);
-						JOptionPane.showInternalMessageDialog(null, "登録が完了しました。");
-						textClear();
-						mainFrame.panelChange(getPanel(), "list");
+						
+						// データ変更メソッドの呼び出し
+						boolean dataRevise = mainFrame.getDataController().dataRevise(data, index);
+						if(dataRevise == false) {
+							JOptionPane.showInternalMessageDialog(null, "同じデータが既に存在します");
+						}else {
+							JOptionPane.showInternalMessageDialog(null, "登録が完了しました。");
+							textClear();
+							mainFrame.panelChange(getPanel(), "list");
+						}
 					}
 				}
 			}
@@ -103,7 +116,7 @@ public class RegisterPanel extends BasePanel {
 		cancelBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(textEmptyCheck()) {
+				if(isEmptyTextCheck()) {
 					cancelPanelChenge();
 				}else {
 					int cancelOpt = JOptionPane.showConfirmDialog(cancelBtn, "入力内容は破棄されます。よろしいですか？", null, JOptionPane.OK_CANCEL_OPTION);
@@ -127,7 +140,7 @@ public class RegisterPanel extends BasePanel {
 	}
 	
 	//テキストフィールドの空白判定(キャンセルボタンのイベントに使用）
-	private boolean textEmptyCheck() {
+	private boolean isEmptyTextCheck() {
 		System.out.println(nameTxt.getText());
 		if("".equals(nameTxt.getText()) && "".equals(nameKanaTxt.getText()) && "".equals(addressTxt.getText())&& "".equals(telTxt.getText())&& "".equals(mailTxt.getText())) {
 			return true;

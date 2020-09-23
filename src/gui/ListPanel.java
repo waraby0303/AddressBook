@@ -5,7 +5,6 @@ import java.awt.event.ActionListener;
 import java.util.List;
 
 import javax.swing.DefaultListModel;
-import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -40,11 +39,6 @@ public class ListPanel extends BasePanel {
 	private JMenuItem menuPc = new JMenuItem("メニュー画面に戻る");
 	private JMenuItem outputPc = new JMenuItem("データ出力");
 
-	/* ボタン */
-	private JButton reviseBtn = new JButton("編集");
-	private JButton removeBtn = new JButton("削除");
-	private JButton cancelBtn = new JButton("キャンセル");
-
 	private JList<PersonalData> dataList = new JList<PersonalData>();
 
 	ListPanel(MainFrame m) {
@@ -67,15 +61,6 @@ public class ListPanel extends BasePanel {
 		sp.setBounds(50,40,500,300);
 		this.add(sp);
 
-		// ボタンの設定、追加
-		reviseBtn.setBounds(380,340,70,30);		// 編集ボタン
-		removeBtn.setBounds(380,340,70,30);		// 削除ボタン
-		cancelBtn.setBounds(460,340,100,30);	// キャンセルボタン
-		
-		// ボタンをパネルに追加し、非表示にする
-		mainFrame.containerAddComp(getPanel(), reviseBtn,cancelBtn,removeBtn);
-		buttonHide(reviseBtn,cancelBtn,removeBtn);
-
 		// "新規登録"メニューの処理
 		register.addActionListener(new ActionListener() {
 			@Override
@@ -89,89 +74,52 @@ public class ListPanel extends BasePanel {
 		revise.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// メッセージボックスの表示
-				JOptionPane.showInternalMessageDialog(null, "編集したい項目を選択し、編集ボタンを押してください。");
+			
+				if(dataList.isSelectionEmpty()) {
+					
+					// 項目が選択されていない場合
+					JOptionPane.showInternalMessageDialog(null, "項目を選択し、再度実行してください。");
 
-				// 編集・キャンセルボタンの配置
-				buttonDisplay(reviseBtn,cancelBtn);
+				}else {
+					// 選択された項目のインデックス番号を取得する
+					int[] indexes = dataList.getSelectedIndices();
 
-				// "編集"ボタンの処理
-				reviseBtn.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
+					if(indexes.length > 1) {
 
-						if(dataList.isSelectionEmpty()) {
+						// 複数選択されていた場合
+						JOptionPane.showInternalMessageDialog(null, "二人以上が選択されています。");
 
-							// 項目が選択されていない場合
-							JOptionPane.showInternalMessageDialog(null, "項目が選択されていません。");
+					}else {
 
-						}else {
-							// 選択された項目のインデックス番号を取得する
-							int[] indexes = dataList.getSelectedIndices();
-
-							if(indexes.length > 1) {
-
-								// 複数選択されていた場合
-								JOptionPane.showInternalMessageDialog(null, "二人以上が選択されています。");
-
-							}else {
-
-								// 編集データを取得し、編集画面に遷移する
-								PersonalData reviseData = dataList.getSelectedValue();
-								mainFrame.panelChange(getPanel(), "revise");
-								mainFrame.getRegisterPanel().setPanelChengeOpt(1);
-								mainFrame.getRegisterPanel().reviseDataSet(reviseData, indexes[0]);
-
-								// 編集・キャンセルボタンを非表示にする
-								buttonHide(reviseBtn,cancelBtn);
-							}
+						// 編集データを取得し、編集画面に遷移する
+						PersonalData reviseData = dataList.getSelectedValue();
+						mainFrame.panelChange(getPanel(), "revise");
+						mainFrame.getRegisterPanel().setPanelChengeOpt(1);
+						mainFrame.getRegisterPanel().reviseDataSet(reviseData, indexes[0]);
 						}
 					}
-				});
-				// "キャンセル"ボタンの処理
-				cancelBtn.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-
-						// 編集・キャンセルボタンを非表示にする
-						buttonHide(reviseBtn,cancelBtn,removeBtn);
-					}
-				});
-			}
-		});
+				}	
+			});
 
 		// "削除"メニューの処理
 		remove.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				JOptionPane.showInternalMessageDialog(null, "削除したいデータを選択してボタンを押してください。");
+				if(dataList.isSelectionEmpty()) {
 
-				// 削除・キャンセルボタンを表示する
-				buttonDisplay(removeBtn,cancelBtn);
-				removeBtn.addActionListener(new ActionListener() {
+					// 選択されていない場合
+					JOptionPane.showInternalMessageDialog(null, "項目を選択し、再度実行してください。");
 
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						if(dataList.isSelectionEmpty()) {
+				}else {
 
-							// 選択されていない場合
-							JOptionPane.showInternalMessageDialog(null, "項目が選択されていません。");
-
-						}else {
-
-							// 削除データを取得し、確認画面を表示する
-							List<PersonalData> listElement = dataList.getSelectedValuesList();
-							int opt = JOptionPane.showConfirmDialog(mainFrame, "選択された項目を削除します。よろしいですか？\n", null, JOptionPane.WARNING_MESSAGE);
-							if(opt == JOptionPane.YES_OPTION) {
-								mainFrame.getDataController().dataRemove(listElement);
-
-								// 削除・キャンセルボタンを非表示にする
-								buttonHide(removeBtn,cancelBtn);
-							}
-						}
+					// 削除データを取得し、確認画面を表示する
+					List<PersonalData> listElement = dataList.getSelectedValuesList();
+					int opt = JOptionPane.showConfirmDialog(mainFrame, "選択された項目を削除します。よろしいですか？\n", null, JOptionPane.WARNING_MESSAGE);
+					if(opt == JOptionPane.YES_OPTION) {
+						mainFrame.getDataController().dataRemove(listElement);
 					}
-				});
+				}
 			}
 		});
 
@@ -183,7 +131,8 @@ public class ListPanel extends BasePanel {
 				String searchWord = JOptionPane.showInputDialog(mainFrame,"名前を入力してください");
 				int[] indexes;						//インデックス番号
 
-				if(!(searchWord.equals(null))) {
+				if(searchWord != null){
+		
 					// 該当データのインデックス番号を返すメソッドを呼び出す
 					indexes = mainFrame.getDataController().nameSearch(searchWord);
 
@@ -220,8 +169,7 @@ public class ListPanel extends BasePanel {
 		 menuPc.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// 各種ボタンを非表示にし、メニュー画面に遷移する
-				buttonHide(reviseBtn,removeBtn,cancelBtn);
+				// メニュー画面に遷移する
 				mainFrame.panelChange(getPanel(), "menu");
 			}
 		});
@@ -230,8 +178,7 @@ public class ListPanel extends BasePanel {
 		 outputPc.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// 各種ボタンを非表示にし、データ出力画面に遷移する
-				buttonHide(reviseBtn,removeBtn,cancelBtn);
+				// データ出力画面に遷移する
 				mainFrame.panelChange(getPanel(), "output");
 			}
 		});
@@ -246,26 +193,6 @@ public class ListPanel extends BasePanel {
 	
 	public void setModel(DefaultListModel<PersonalData> listModel) {
 		this.dataList.setModel(listModel);
-	}
-
-	/**
-	 * ボタンを非表示にする
-	 * @param buttons ボタン
-	 */
-	private void buttonHide(JButton... buttons) {
-		for(JButton b:buttons) {
-			b.setVisible(false);
-		}
-	}
-
-	/**
-	 * ボタンを表示する
-	 * @param buttons ボタン
-	 */
-	private void buttonDisplay(JButton...buttons) {
-		for(JButton b:buttons) {
-			b.setVisible(true);
-		}
 	}
 
 }

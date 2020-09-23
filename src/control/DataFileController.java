@@ -44,6 +44,7 @@ public class DataFileController {
 	 * @throws NoSuchPaddingException	パディング方式が使用できない場合
 	 * @throws InvalidKeyException		復号化キーが使用できない場合
 	 */
+	@SuppressWarnings("unchecked")
 	DefaultListModel<PersonalData> dataFileRead() throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException{
 		// ファイルの中身が空か判定
 		boolean emptyFileCheck = file.length() == 0;
@@ -55,14 +56,14 @@ public class DataFileController {
 
 			// 復号化モードで初期化
 			c.init(Cipher.DECRYPT_MODE, new SecretKeySpec(COMMON_KEY.getBytes(), CRYPT_ALGORITHM));
-			
+
 			// ファイルの読み込み
 			try (FileInputStream f = new FileInputStream(file);
 				BufferedInputStream b = new BufferedInputStream(f);
 				CipherInputStream ci = new CipherInputStream(b, c);
 				ObjectInputStream in = new ObjectInputStream(ci)){
 
-				return  (DefaultListModel<PersonalData>) in.readObject();
+				return (DefaultListModel<PersonalData>)in.readObject();
 
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
@@ -88,16 +89,16 @@ public class DataFileController {
 	 */
 	void dataFileWrite(DefaultListModel<PersonalData> list) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException {
 		Cipher c = Cipher.getInstance(CRYPT_ALGORITHM);
-		
+
 		// 暗号化モードで初期化
 		c.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(COMMON_KEY.getBytes(), CRYPT_ALGORITHM));
-		
+
 		// ファイルに書き込む
 		try(FileOutputStream f = new FileOutputStream(PATH);
 				BufferedOutputStream b = new BufferedOutputStream(f);
 				CipherOutputStream co = new CipherOutputStream(b, c);
 				ObjectOutputStream out = new ObjectOutputStream(co)){
-					
+
 			out.writeObject(list);
 		}catch(IOException e) {
 			e.printStackTrace();
