@@ -52,9 +52,7 @@ public class DataController {
 	public boolean dataRegister(PersonalData data) {
 
 		// データが既に存在するか確認
-		boolean dataExist = listModel.isDataExistsChecked(data);
-
-		if(dataExist == true) {
+		if(listModel.isDataExistsChecked(data) == true) {
 
 			// 存在する場合はfalseを返す
 			return false;
@@ -86,9 +84,7 @@ public class DataController {
 	public boolean dataRevise(PersonalData data,int index) {
 
 		// データが既に存在するか確認
-		boolean dataExists = listModel.isDataExistsChecked(data);
-
-		if(dataExists==true) {
+		if(listModel.isDataExistsChecked(data)==true) {
 			return false;
 		}else {
 
@@ -219,8 +215,6 @@ public class DataController {
 		}
 	}
 
-
-
 	/**
 	 * データ保存用ファイルを読み込む
 	 * */
@@ -240,6 +234,7 @@ public class DataController {
 
 				// ファイルが空でない場合
 				listModel.setListModel(list);
+				mainFrame.getListPanel().setModel(listModel.getListModel());
 			}
 		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException e) {
 			e.printStackTrace();

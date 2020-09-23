@@ -24,7 +24,7 @@ public class RegisterPanel extends BasePanel {
 
 	private JButton registerBtn = new JButton("登録");			// 登録ボタン
 	private JButton cancelBtn = new JButton("キャンセル");		// キャンセルボタン
-	
+
 	private int panelChengeOpt;		// 画面オプション(0:新規登録 1:編集)
 	private int index;				// 編集時のインデックス番号
 
@@ -77,20 +77,19 @@ public class RegisterPanel extends BasePanel {
 				PersonalData data = mainFrame.getDataController().dataCreate(nameTxt.getText(), nameKanaTxt.getText(), addressTxt.getText(), telTxt.getText(), mailTxt.getText());
 				//　新規登録画面
 				if(mainFrame.getTitle().equals("新規登録")) {
-					
+
 					if(isEmptyTextChecked()==true) {
-						
+
 						// データが未入力の場合
 						JOptionPane.showInternalMessageDialog(null, "データが入力されていません。");
 					}else {
-						
+
 						// データが入力されている場合
 						int yesOpt = JOptionPane.showConfirmDialog(registerBtn, "以下の内容で登録します。よろしいですか？\n" + mainFrame.getDataController().dataDisplay(data), null, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 						if( yesOpt == JOptionPane.OK_OPTION) {
-						
+
 							// データ登録メソッドの呼び出し
-							boolean dataRegister = mainFrame.getDataController().dataRegister(data);
-							if(dataRegister == false) {
+							if(mainFrame.getDataController().dataRegister(data) == false) {
 								JOptionPane.showInternalMessageDialog(null, "同じデータが既に存在します");
 							}else {
 								JOptionPane.showInternalMessageDialog(null, "登録が完了しました。");
@@ -98,20 +97,19 @@ public class RegisterPanel extends BasePanel {
 							}
 						}
 					}
-						
+
 				//　編集画面
 				}else if(mainFrame.getTitle().equals("編集")) {
-						
+
 					if(isEmptyTextChecked()==true) {
-						
+
 						// データが未入力の場合
 						JOptionPane.showInternalMessageDialog(null, "データが入力されていません。");
 					}else {int yesOpt = JOptionPane.showConfirmDialog(registerBtn, "以下の内容で登録します。よろしいですか？\n" + mainFrame.getDataController().dataDisplay(data), null, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 						if( yesOpt == JOptionPane.OK_OPTION) {
-							
+
 							// データ変更メソッドの呼び出し
-							boolean dataRevise = mainFrame.getDataController().dataRevise(data, index);
-							if(dataRevise == false) {
+							if(mainFrame.getDataController().dataRevise(data,index) == false) {
 								JOptionPane.showInternalMessageDialog(null, "同じデータが既に存在します");
 							}else {
 								JOptionPane.showInternalMessageDialog(null, "登録が完了しました。");
@@ -146,14 +144,14 @@ public class RegisterPanel extends BasePanel {
 		//各種コンポーネントの追加
 		mainFrame.containerAddComp(this,nameLbl,nameTxt,nameKanaLbl,nameKanaTxt,addressLbl,addressTxt,telLbl,telTxt,mailLbl,mailTxt,registerBtn,cancelBtn);
 	}
-	
+
 	/**
 	 * @param opt 画面オプション(0:新規登録 1:編集)
 	 */
 	public void setPanelChengeOpt(int opt) {
 		panelChengeOpt = opt;
 	}
-	
+
 	//テキストフィールドの空白判定(キャンセルボタンのイベントに使用）
 	private boolean isEmptyTextChecked() {
 		System.out.println(nameTxt.getText());
@@ -163,7 +161,7 @@ public class RegisterPanel extends BasePanel {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * 編集するデータをテキストフィールドにセットする
 	 * @param data 編集する個人データ
